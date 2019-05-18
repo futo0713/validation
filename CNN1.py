@@ -13,8 +13,29 @@ X_train,T_train,X_test,T_test = function1.mnist(save_file)
 F_size = 5
 F = np.random.randn(F_size,F_size)
 
+Wo = np.random.randn(576, 10)
+Bo = np.random.randn(1,10)
+learning_rate = 0.001
+
+E_save = []
+accuracy_save = []
+start_time = time.time()
+
+batch_size = 100
 #-----------------------------------------------------
 #iteration
 num_of_itr=1
 for i in range(num_of_itr):
-    print(F)
+    #batch
+    X_batch,T_batch = function1.batch(X_train,T_train,batch_size)
+
+    #convolute
+    C = function1.convolute(X_batch,F)
+    Y = function1.affine(C,Wo,Bo,'softmax')
+
+    E = function1.error(Y,T_batch)
+    E_save = np.append(E_save, E)
+
+    Acc = function1.accuracy(Y,T_batch)
+    accuracy_save = np.append(accuracy_save, Acc)
+    print(Y.shape)
