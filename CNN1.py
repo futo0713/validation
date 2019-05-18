@@ -22,15 +22,18 @@ accuracy_save = []
 start_time = time.time()
 
 batch_size = 100
+
 #-----------------------------------------------------
 #iteration
 num_of_itr=1
 for i in range(num_of_itr):
-    #batch
-    X_batch,T_batch = function1.batch(X_train,T_train,batch_size)
 
-    #convolute
+    X_batch,T_batch = function1.batch(X_train,T_train,batch_size)
+    # function1.show_img(X_batch,T_batch,1)
+
     C = function1.convolute(X_batch,F)
+    # function1.show_img(C,T_batch,1)
+
     Y = function1.affine(C,Wo,Bo,'softmax')
 
     E = function1.error(Y,T_batch)

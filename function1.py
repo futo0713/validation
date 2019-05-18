@@ -23,15 +23,6 @@ def mnist(PATH):
 
     return [X_train,T_train,X_test,T_test]
 
-def show(img,label,i):
-    img = np.reshape(img[i],(28,28))
-
-    plt.figure()
-    plt.imshow(img, cmap='gray_r')
-    plt.show()
-
-    print(label[i])
-
 #-----------------------------------------------------
 #math 
 def sigmoid(x):
@@ -54,6 +45,28 @@ def batch(img,label,batch_size):
     T_batch = label[batch_mask]
 
     return [X_batch,T_batch]
+
+#-----------------------------------------------------
+#batch
+def convolute(IMG,F):
+    IMG_size = int(np.sqrt(IMG.shape[1]))
+    F_size = int(F.shape[0])
+    batch_size = int(IMG.shape[0])
+    FM_size = int(np.sqrt(IMG.shape[1])-F_size+1)
+    FM = np.empty((0,FM_size**2))
+
+    for M in range (batch_size):
+        img = np.reshape(IMG[M],(IMG_size,IMG_size))
+        img_storage = []
+
+        for i in range(FM_size):
+            for j in range(FM_size):
+                pick_img = img[i:i+F_size,j:j+F_size]
+                img_storage = np.append(img_storage,np.tensordot(F,pick_img))
+
+        FM = np.vstack((FM,img_storage))
+
+    return FM
 
 #-----------------------------------------------------
 #forward propagation
@@ -115,3 +128,32 @@ def plot_loss(E_save):
     plt.grid(True)
     plt.plot(E_save, color='blue')
     plt.show()
+    
+#-----------------------------------------------------
+#img confirm
+def show(img,label,i):
+    img = np.reshape(img[i],(28,28))
+
+    plt.figure()
+    plt.imshow(img, cmap='gray_r')
+    plt.show()
+
+    print(label[i])
+
+def show_img(IMG,T_batch,i):
+    #Error code
+    if i <= IMG.shape[0]:
+        pass
+    else:
+        print("★ Error(show_img):バッチ数よりも大きな値を入力しています")
+        sys.exit()
+
+    for i in range(i):
+        L = int(np.sqrt(IMG.shape[1]))
+        img = np.reshape(IMG[i],(L,L))
+
+        plt.figure()
+        plt.imshow(img, cmap='gray_r')
+        plt.show()
+
+        print(T_batch[i])
