@@ -48,7 +48,7 @@ def batch(img,label,batch_size):
 
 #-----------------------------------------------------
 #batch
-def convolute(IMG,F):
+def convolute(IMG,F,Bc):
     IMG_size = int(np.sqrt(IMG.shape[1]))
     F_size = int(F.shape[0])
     batch_size = int(IMG.shape[0])
@@ -65,7 +65,9 @@ def convolute(IMG,F):
                 img_storage = np.append(img_storage,np.tensordot(F,pick_img))
 
         FM = np.vstack((FM,img_storage))
-
+    
+    FM = FM+Bc
+    FM = np.where(FM<0,0,FM)
     return FM
 
 def deconvolute(IMG,pre_IMG):
@@ -178,3 +180,9 @@ def show_img(IMG,T_batch,i):
         plt.show()
 
         print(T_batch[i])
+
+def show_progress(i,num):
+    if i%(num/10) == 0:
+        print('現在{}%'.format(100*i/num))
+    else:
+        pass
