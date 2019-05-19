@@ -48,26 +48,37 @@ def batch(img,label,batch_size):
 
 #-----------------------------------------------------
 #batch
-def convolute(IMG,F,Bc):
+def convolute(IMG,F,Bc,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
     F_size = int(F.shape[0])
     batch_size = int(IMG.shape[0])
-    FM_size = int(np.sqrt(IMG.shape[1])-F_size+1)
+    FM_size = int((np.sqrt(IMG.shape[1])+2*padding-F_size)/stride+1)
     FM = np.empty((0,FM_size**2))
+
+    if (np.sqrt(IMG.shape[1])+2*padding-F_size)%stride != 0:
+        print('★ convolute Error: ストライドが割り切れません')
+        print('★ f/stride -> {0}/{1}'.format(np.sqrt(IMG.shape[1])+2*padding-F_size,stride))
+        sys.exit()
+
+    else:
+        pass
 
     for M in range (batch_size):
         img = np.reshape(IMG[M],(IMG_size,IMG_size))
+        img_pad = np.zeros((IMG_size+2*padding,IMG_size+2*padding))
+        img_pad[padding:padding+IMG_size,padding:padding+IMG_size]=img
         img_storage = []
 
         for i in range(FM_size):
             for j in range(FM_size):
-                pick_img = img[i:i+F_size,j:j+F_size]
+                pick_img = img_pad[i*stride:i*stride+F_size,j*stride:j*stride+F_size]
                 img_storage = np.append(img_storage,np.tensordot(F,pick_img))
 
         FM = np.vstack((FM,img_storage))
-    
-    FM = FM+Bc
-    FM = np.where(FM<0,0,FM)
+
+    FM = FM+Bc #Bias
+    FM = np.where(FM<0,0,FM) #ReLU
+
     return FM
 
 def deconvolute(IMG,pre_IMG):
