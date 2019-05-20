@@ -103,8 +103,8 @@ def deconvolute(IMG,delta,F,padding,stride):
                 img_storage = np.append(img_storage,np.tensordot(dF,pick_img))
 
         dFM = np.vstack((dFM,img_storage))
-        F = np.where(F<0,0,1)
-        dFM = dFM*np.reshape(F,(1,F_size**2))
+        RF = np.where(F<0,0,1)
+        dFM = dFM*np.reshape(RF,(1,F_size**2))
 
     return dFM
 

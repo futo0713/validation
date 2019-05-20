@@ -1,5 +1,6 @@
 import function1
 import numpy as np
+import matplotlib.pyplot as plt
 import time
 
 #minist_load
@@ -13,7 +14,7 @@ X_train,T_train,X_test,T_test = function1.mnist(save_file)
 F_size = 5
 F = np.random.randn(F_size,F_size)
 
-padding = 1
+padding = 0
 stride = 1
 
 FM_size = int((np.sqrt(X_train.shape[1])+2*padding-F_size)/stride+1)
@@ -32,7 +33,7 @@ batch_size = 100
 
 #-----------------------------------------------------
 #iteration
-num_of_itr=1
+num_of_itr=100
 for i in range(num_of_itr):
     function1.show_progress(i,num_of_itr)
     X_batch,T_batch = function1.batch(X_train,T_train,batch_size)
@@ -55,23 +56,33 @@ for i in range(num_of_itr):
     dBo = np.reshape(np.sum(Y-T_batch, axis=0),(1,10))
 
     delta = np.dot(Y-T_batch,Wo.T)
-    print(delta.shape)
-    dF = function1.deconvolute(X_batch,delta) 
+    # print(delta.shape)
+
+    dF = function1.deconvolute(X_batch,delta,F,padding,stride) 
     dF = np.average(dF, axis=0)
-    print(dF.shape)
-#     dF = np.reshape(dF,(5,5)) 
+    # print(dF.shape)
+    dF = np.reshape(dF,(5,5)) 
 
-#     dBc = delta
-#     #=========================================
-#     Wo = function1.update(Wo,learning_rate,dWo)
-#     Bo = function1.update(Bo,learning_rate,dBo)
-#     F = function1.update(F,learning_rate,dF)
-#     Bc = function1.update(Bc,learning_rate,dBc)
+    dBc = delta
+    #=========================================
+    Wo = function1.update(Wo,learning_rate,dWo)
+    Bo = function1.update(Bo,learning_rate,dBo)
+    F = function1.update(F,learning_rate,dF)
+    Bc = function1.update(Bc,learning_rate,dBc)
 
-# end_time = time.time()
-# total_time = end_time - start_time
-# print(total_time)
+    if i%(num_of_itr/10) == 0:
+        plt.figure()
+        plt.imshow(F, cmap='gray_r')
+        plt.show()
 
-# #show graph
-# function1.plot_acc(accuracy_save)
-# function1.plot_loss(E_save)
+    else:
+        pass
+
+
+end_time = time.time()
+total_time = end_time - start_time
+print(total_time)
+
+#show graph
+function1.plot_acc(accuracy_save)
+function1.plot_loss(E_save)
