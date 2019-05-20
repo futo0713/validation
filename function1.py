@@ -57,7 +57,7 @@ def convolute(IMG,F,Bc,padding,stride):
 
     if (np.sqrt(IMG.shape[1])+2*padding-F_size)%stride != 0:
         print('★ convolute Error: ストライドが割り切れません')
-        print('★ f/stride -> {0}/{1}'.format(np.sqrt(IMG.shape[1])+2*padding-F_size,stride))
+        print('★ f/stride -> {0}/{1}'.format(int(np.sqrt(IMG.shape[1])+2*padding-F_size),stride))
         sys.exit()
 
     else:
