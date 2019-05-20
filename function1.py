@@ -81,21 +81,24 @@ def convolute(IMG,F,Bc,padding,stride):
 
     return FM
 
-def deconvolute(IMG,pre_IMG):
+def deconvolute(IMG,delta,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
-    dF_size = int(np.sqrt(pre_IMG.shape[1]))
+    dF_size = int(np.sqrt(delta.shape[1]))
     batch_size = int(IMG.shape[0])
-    dFM_size = IMG_size-dF_size+1
+    dFM_size = int((IMG_size-dF_size+2*padding)/stride+1)
     dFM = np.empty((0,dFM_size**2))
 
     for M in range (batch_size):
         img = np.reshape(IMG[M],(IMG_size,IMG_size))
-        dF = np.reshape(pre_IMG[M],(dF_size,dF_size))
+        img_pad = np.zeros((IMG_size+2*padding,IMG_size+2*padding))
+        img_pad[padding:padding+IMG_size,padding:padding+IMG_size]=img
+
+        dF = np.reshape(delta[M],(dF_size,dF_size))
         img_storage = []
 
         for i in range(dFM_size):
             for j in range(dFM_size):
-                pick_img = img[i:i+dF_size,j:j+dF_size]
+                pick_img = img_pad[i*stride:i*stride+dF_size,j*stride:j*stride+dF_size]
                 img_storage = np.append(img_storage,np.tensordot(dF,pick_img))
 
         dFM = np.vstack((dFM,img_storage))
