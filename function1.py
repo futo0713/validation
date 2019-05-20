@@ -47,7 +47,7 @@ def batch(img,label,batch_size):
     return [X_batch,T_batch]
 
 #-----------------------------------------------------
-#batch
+#convolution
 def convolute(IMG,F,Bc,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
     F_size = int(F.shape[0])
@@ -81,12 +81,13 @@ def convolute(IMG,F,Bc,padding,stride):
 
     return FM
 
-def deconvolute(IMG,delta,padding,stride):
+def deconvolute(IMG,delta,F,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
     dF_size = int(np.sqrt(delta.shape[1]))
     batch_size = int(IMG.shape[0])
     dFM_size = int((IMG_size-dF_size+2*padding)/stride+1)
     dFM = np.empty((0,dFM_size**2))
+    F_size = int(F.shape[0])
 
     for M in range (batch_size):
         img = np.reshape(IMG[M],(IMG_size,IMG_size))
@@ -102,6 +103,8 @@ def deconvolute(IMG,delta,padding,stride):
                 img_storage = np.append(img_storage,np.tensordot(dF,pick_img))
 
         dFM = np.vstack((dFM,img_storage))
+        F = np.where(F<0,0,1)
+        dFM = dFM*np.reshape(F,(1,F_size**2))
 
     return dFM
 
