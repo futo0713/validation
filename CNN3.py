@@ -56,11 +56,8 @@ for i in range(num_of_itr):
     dBo = np.reshape(np.sum(Y-T_batch, axis=0),(1,10))
 
     delta = np.dot(Y-T_batch,Wo.T)
-    # print(delta.shape)
-
     dF = function1.deconvolute(X_batch,delta,F,padding,stride) 
     dF = np.average(dF, axis=0)
-    # print(dF.shape)
     dF = np.reshape(dF,(5,5)) 
 
     dBc = delta
@@ -69,14 +66,6 @@ for i in range(num_of_itr):
     Bo = function1.update(Bo,learning_rate,dBo)
     F = function1.update(F,learning_rate,dF)
     Bc = function1.update(Bc,learning_rate,dBc)
-
-    if i%(num_of_itr/10) == 0:
-        plt.figure()
-        plt.imshow(F, cmap='gray_r')
-        plt.show()
-
-    else:
-        pass
 
 
 end_time = time.time()

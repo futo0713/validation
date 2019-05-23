@@ -76,16 +76,16 @@ def convolute(IMG,F,Bc,padding,stride):
 
         FM = np.vstack((FM,img_storage))
 
-    FM = FM+Bc #Bias
-    FM = np.where(FM<0,0,FM) #ReLU
+    FM_bias = FM+Bc #Bias
+    FM_relu = np.where(FM_bias<0,0,FM_bias) #ReLU
 
-    return FM
+    return FM_relu
 
 def deconvolute(IMG,delta,F,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
     dF_size = int(np.sqrt(delta.shape[1]))
     batch_size = int(IMG.shape[0])
-    dFM_size = int((IMG_size-dF_size+2*padding)/stride+1)
+    dFM_size = int((IMG_size+2*padding)-stride*(dF_size-1))
     dFM = np.empty((0,dFM_size**2))
     F_size = int(F.shape[0])
 
@@ -103,10 +103,10 @@ def deconvolute(IMG,delta,F,padding,stride):
                 img_storage = np.append(img_storage,np.tensordot(dF,pick_img))
 
         dFM = np.vstack((dFM,img_storage))
-        RF = np.where(F<0,0,1)
-        dFM = dFM*np.reshape(RF,(1,F_size**2))
+        F_deR = np.where(F<0,0,1)
+        dFM_deR = dFM*np.reshape(F_deR,(1,F_size**2))
 
-    return dFM
+    return dFM_deR
 
 #-----------------------------------------------------
 #forward propagation
@@ -156,6 +156,7 @@ def plot_acc(accuracy_save):
     # plt.ylim(0, 100)
     plt.grid(True)
     plt.plot(accuracy_save, color='blue')
+    plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(accuracy)')
     plt.show()
 
 def plot_loss(E_save):
@@ -167,6 +168,7 @@ def plot_loss(E_save):
     # plt.ylim(0, 100)
     plt.grid(True)
     plt.plot(E_save, color='blue')
+    plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(error)')
     plt.show()
     
 #-----------------------------------------------------
