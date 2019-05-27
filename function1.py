@@ -32,8 +32,8 @@ def softmax(z):
     return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
 
 def loss(y, t):
-    delta = 1e-7
-    return -np.sum(np.multiply(t, np.log(y+delta)) + np.multiply((1 - t), np.log(1 - y+delta)))
+    minute = 1e-7
+    return -np.sum(np.multiply(t, np.log(y+minute)) + np.multiply((1 - t), np.log(1 - y+minute)))
 
 #-----------------------------------------------------
 #batch
@@ -74,12 +74,11 @@ def convolute(IMG,F,Bc,padding,stride):
                 pick_img = img_pad[i*stride:i*stride+F_size,j*stride:j*stride+F_size]
                 img_storage = np.append(img_storage,np.tensordot(F,pick_img))
 
-        FM = np.vstack((FM,img_storage))
+        FM_bias = img_storage+Bc #Bias
+        FM_relu = np.where(FM_bias<0,0,FM_bias) #ReLU
 
-    FM_bias = FM+Bc #Bias
-    FM_relu = np.where(FM_bias<0,0,FM_bias) #ReLU
-
-    return FM_relu
+        FM = np.vstack((FM,FM_relu))
+    return FM
 
 def deconvolute(IMG,delta,F,padding,stride):
     IMG_size = int(np.sqrt(IMG.shape[1]))
@@ -156,7 +155,7 @@ def plot_acc(accuracy_save):
     # plt.ylim(0, 100)
     plt.grid(True)
     plt.plot(accuracy_save, color='blue')
-    plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(accuracy)')
+    # plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(accuracy)')
     plt.show()
 
 def plot_loss(E_save):
@@ -168,7 +167,7 @@ def plot_loss(E_save):
     # plt.ylim(0, 100)
     plt.grid(True)
     plt.plot(E_save, color='blue')
-    plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(error)')
+    # plt.savefig('/Users/tsutsumifutoshishi/Desktop/cnn_test/plot(error)')
     plt.show()
     
 #-----------------------------------------------------
@@ -205,3 +204,8 @@ def show_progress(i,num):
         print('現在{}%'.format(100*i/num))
     else:
         pass
+
+def save(parameter,name,path):
+    save_file = path + '/{}.pkl'.format(name)
+    with open(save_file, 'wb') as f:
+        pickle.dump(parameter, f) 
